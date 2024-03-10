@@ -278,26 +278,52 @@ export default function Index() {
   };
 
   console.log("sendMessage", sendMessage);
+
+  // const FetchChatLists = async () => {
+  //   const payload = {
+  //     page: 1,
+  //     limit: 20,
+  //     sort: {
+  //       order: "desc",
+  //       field: "_id",
+  //     },
+  //     room_id: roomDetails?._id,
+  //   };
+  //   chatlists(payload, {
+  //     onSuccess: (response: any) => {
+  //       console.log("chatres", response);
+  //       setClientchartlists(response?.data);
+  //     },
+  //     onError: () => {
+  //       console.log("Chat Error");
+  //     },
+  //   });
+  // };
+
   const FetchChatLists = async () => {
-    const payload = {
-      page: 1,
-      limit: 20,
-      sort: {
-        order: "desc",
-        field: "_id",
-      },
-      room_id: roomDetails?._id,
-    };
-    chatlists(payload, {
-      onSuccess: (response: any) => {
-        console.log("chatres", response);
-        setClientchartlists(response?.data);
-      },
-      onError: () => {
-        console.log("Chat Error");
-      },
-    });
+    if (roomDetails?._id) {
+      const payload = {
+        page: 1,
+        limit: 20,
+        sort: {
+          order: "desc",
+          field: "_id",
+        },
+        room_id: roomDetails._id,
+      };
+  
+      chatlists(payload, {
+        onSuccess: (response: any) => {
+          console.log("chatres", response);
+          setClientchartlists(response?.data);
+        },
+        onError: () => {
+          console.log("Chat Error");
+        },
+      });
+    }
   };
+  
 
   useEffect(() => {
     if (roomDetails?._id) {
@@ -330,6 +356,13 @@ export default function Index() {
     socket.on("createMessage", (data) => {
       console.log("Socket Messagereceived:", data);
       FetchChatLists();
+      // setClientchartlists((prevMessages: any) => {
+      //   if (prevMessages && Array.isArray(prevMessages)) {
+      //     return [data, ...prevMessages];
+      //   } else {
+      //     return [data];
+      //   }
+      // });
     });
 
     socket.on("test", (data) => {
@@ -359,7 +392,8 @@ export default function Index() {
       lastMessageRef.current.scrollIntoView();
     }
   }, [clientchatlists]);
-
+  console.log("clientchatlists", clientchatlists);
+  
   return (
     <div className="pt-5 pb-20 sm:pb-5">
       {profileLoading || userverifyLoding ? (
@@ -1236,7 +1270,7 @@ export default function Index() {
                                                 <>
                                                   <div
                                                     key={index}
-                                                    // ref={lastMessageRef}
+                                                    ref={containerRef}
                                                     className="px-3 py-2 rounded-md bg-[#F5EFFD] max-w-[440px] ml-auto mb-4"
                                                   >
                                                     <h3 className="text-secondary text-sm font-medium	mb-[5px]">
@@ -1318,17 +1352,23 @@ export default function Index() {
                                                       </div>
                                                     </div>
                                                   </div>
+                                                  <div
+                                                    ref={lastMessageRef}
+                                                  />
                                                 </>
                                               )}
                                             </>
                                           );
                                         }
                                       )}
+                                    <div
+                                      ref={lastMessageRef}
+                                    />
                                   </div>
                                   <div className="p-6">
                                     <ClientMessageInput
                                       roomId={roomDetails?._id}
-                                      messageData={FetchChatLists}
+                                      messageData={FetchChatLists()}
                                       sendMessageData={handleSendmessage}
                                     />
                                   </div>

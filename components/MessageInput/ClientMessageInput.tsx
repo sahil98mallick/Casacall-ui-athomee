@@ -52,10 +52,12 @@ function ClientMessageInput({
     });
     socket.emit("createMessage", { room_id: roomId, text: inputStr });
     setIsLoading(false);
+
     socket.on("createMessage", (data) => {
       console.log("Socket Messagereceived:", data);
       setIsLoading(false);
       messageData();
+      setInputStr("");
     });
     socket.on("error", (error) => {
       console.error("Socket Error:", error);
